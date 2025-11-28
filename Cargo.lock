@@ -6666,6 +6666,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "rigoblock-client"
+version = "0.0.0"
+dependencies = [
+ "alloy-primitives",
+ "alloy-sol-macro",
+ "alloy-sol-types",
+ "bincode",
+ "sp1-cc-client-executor",
+ "sp1-zkvm",
+]
+
+[[package]]
+name = "rigoblock-host"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "alloy-contract",
+ "alloy-node-bindings",
+ "alloy-primitives",
+ "alloy-provider",
+ "alloy-rpc-types",
+ "alloy-sol-macro",
+ "alloy-sol-types",
+ "bincode",
+ "clap",
+ "dotenv",
+ "eyre",
+ "serde",
+ "serde_json",
+ "sp1-build",
+ "sp1-cc-client-executor",
+ "sp1-cc-host-executor",
+ "sp1-sdk",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
