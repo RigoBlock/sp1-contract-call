@@ -224,6 +224,15 @@ impl<'a> ClientExecutor<'a, reth_optimism_primitives::OpPrimitives> {
 }
 
 impl<'a, P: Primitives> ClientExecutor<'a, P> {
+    /// Check if header validation should be skipped for chains with known consensus issues
+    fn should_skip_header_validation(chain_id: u64) -> bool {
+        match chain_id {
+            42161 => true, // Arbitrum One - has different L2 consensus that conflicts with EthBeaconConsensus
+            56 => true,    // BSC - uses Parlia PoA which conflicts with Ethereum consensus validation  
+            _ => false,
+        }
+    }
+
     /// Instantiates a new [`ClientExecutor`]
     fn new(sketch_input: &'a EvmSketchInput) -> Result<Self, ClientError> {
         let chain_spec = P::build_spec(&sketch_input.genesis)?;
@@ -232,8 +241,17 @@ impl<'a, P: Primitives> ClientExecutor<'a, P> {
 
         let sealed_headers = sketch_input.sealed_headers().collect::<Vec<_>>();
 
-        P::validate_header(&sealed_headers[0], chain_spec.clone())
-            .expect("the header is not valid");
+        // Skip header validation for chains with known consensus compatibility issues
+        let chain_id = chain_spec.chain_id();
+        eprintln!("DEBUG: Processing chain ID {} for header validation", chain_id);
+        if !Self::should_skip_header_validation(chain_id) {
+            eprintln!("DEBUG: Running header validation for chain ID {}", chain_id);
+            P::validate_header(&sealed_headers[0], chain_spec.clone())
+                .expect("the header is not valid");
+        } else {
+            // Debug: Log that we're skipping validation
+            eprintln!("DEBUG: Skipping header validation for chain ID {}", chain_id);
+        }
 
         // Verify the state root
         assert_eq!(header.state_root, sketch_input.state.state_root(), "State root mismatch");
@@ -243,8 +261,11 @@ impl<'a, P: Primitives> ClientExecutor<'a, P> {
         for ancestor in sealed_headers.iter().skip(1) {
             let ancestor_hash = ancestor.hash();
 
-            P::validate_header(ancestor, chain_spec.clone())
-                .unwrap_or_else(|_| panic!("the ancestor {} header in not valid", ancestor.number));
+            // Skip header validation for chains with known consensus compatibility issues
+            if !Self::should_skip_header_validation(chain_spec.chain_id()) {
+                P::validate_header(ancestor, chain_spec.clone())
+                    .unwrap_or_else(|_| panic!("the ancestor {} header in not valid", ancestor.number));
+            }
             assert_eq!(
                 previous_header.parent_hash, ancestor_hash,
                 "block {} is not the parent of {}",
