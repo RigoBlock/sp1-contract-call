@@ -11,6 +11,8 @@ members = [
     "examples/optimism/client",
     "examples/verify-quorum/host",
     "examples/verify-quorum/client",
+    "examples/rigoblock/host",
+    "examples/rigoblock/client",
     "crates/client-executor",
     "crates/host-executor",
 ]

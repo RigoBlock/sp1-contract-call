@@ -1,0 +1,58 @@
+[package]
+name = "rigoblock-host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "rigoblock_host"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rigoblock-basic"
+path = "src/basic.rs"
+
+# [[bin]]
+# name = "rigoblock-onchain-verify"
+# path = "src/onchain_verify.rs"
+
+[dependencies]
+# workspace
+sp1-cc-host-executor = { path = "../../../crates/host-executor", features = ["optimism"] }
+sp1-cc-client-executor = { path = "../../../crates/client-executor" }
+
+alloy-genesis = { version = "1.1.0", default-features = false, features = ["serde-bincode-compat"] }
+alloy-chains = "0.1"
+
+# alloy
+alloy-contract.workspace = true
+# alloy-genesis.workspace = true
+alloy-node-bindings.workspace = true
+alloy-primitives.workspace = true
+alloy-sol-types.workspace = true
+alloy-rpc-types.workspace = true
+alloy-sol-macro.workspace = true
+alloy-provider.workspace = true
+# Alloy host dependencies
+alloy.workspace = true
+
+# misc:
+url.workspace = true
+tokio.workspace = true
+eyre.workspace = true
+bincode.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+dotenv.workspace = true
+reth-chainspec.workspace = true
+clap = { version = "4.0", features = ["derive"] }
+
+# sp1
+sp1-sdk.workspace = true
+
+[build-dependencies]
+sp1-build.workspace = true
+
+[features]
+default = []
+cuda = ["sp1-sdk/cuda"]
