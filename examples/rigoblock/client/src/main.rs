@@ -2,20 +2,20 @@
 sp1_zkvm::entrypoint!(main);
 
 use alloy_primitives::{Address, Bytes, hex};
-use sp1_cc_client_executor::{io::EvmSketchInput, ClientExecutor, ContractInput /*, Genesis*/};
+use sp1_cc_client_executor::{io::EvmSketchInput, ClientExecutor, ContractInput , Genesis};
 
 /// Determine if a genesis configuration represents an OP stack chain
-//fn is_op_stack_chain(genesis: &Genesis) -> bool {
-//    match genesis {
-//        Genesis::OpMainnet => true,
-//        Genesis::Custom(config) => {
-//            // Base (8453), Unichain (130), and Optimism (10) use OP stack
-//            // Chain 10 will use Genesis::OpMainnet, but if custom genesis is used for any reason
-//            matches!(config.chain_id, 10 | 8453 | 130)
-//        }
-//        _ => false,
-//    }
-//}
+fn is_op_stack_chain(genesis: &Genesis) -> bool {
+    match genesis {
+        Genesis::OpMainnet => true,
+        Genesis::Custom(config) => {
+            // Base (8453), Unichain (130), and Optimism (10) use OP stack
+            // Chain 10 will use Genesis::OpMainnet, but if custom genesis is used for any reason
+            matches!(config.chain_id, 10 | 8453 | 130)
+        }
+        _ => false,
+    }
+}
 
 pub fn main() {
     // Read the state sketch from stdin. Use this during the execution in order to
@@ -39,11 +39,11 @@ pub fn main() {
     // Execute based on chain type
     // For OP stack chains (Optimism, Base, Unichain), use the optimism executor
     // For other chains (Ethereum, Arbitrum, BNB Chain), use the eth executor
-    //if is_op_stack_chain(&state_sketch.genesis) {
-    //    let executor = ClientExecutor::optimism(&state_sketch).unwrap();
-    //    executor.execute(create_input).unwrap();
-    //} else {
+    if is_op_stack_chain(&state_sketch.genesis) {
+        let executor = ClientExecutor::optimism(&state_sketch).unwrap();
+        executor.execute(create_input).unwrap();
+    } else {
         let executor = ClientExecutor::eth(&state_sketch).unwrap();
         executor.execute(create_input).unwrap();
-    //}
+    }
 }

@@ -113,10 +113,10 @@ async fn main() -> eyre::Result<()> {
 
     // Handle execution based on chain type to avoid type mismatch
     // EthPrimitives chains vs OpPrimitives chains need separate handling
-    //let is_op_stack = matches!(chain, SupportedChain::Optimism | SupportedChain::Base | SupportedChain::Unichain);
+    let is_op_stack = matches!(chain, SupportedChain::Optimism | SupportedChain::Base | SupportedChain::Unichain);
     
     let input;
-    /*if is_op_stack {
+    if is_op_stack {
         // OP stack chains use OpPrimitives
         let sketch = match chain {
             SupportedChain::Optimism => {
@@ -160,26 +160,10 @@ async fn main() -> eyre::Result<()> {
 
         println!("Finalizing state sketch...");
         input = sketch.finalize().await?;
-    } else {*/
+    } else {
         // Non-OP stack chains use EthPrimitives
         let sketch = match chain {
-            SupportedChain::Ethereum => {
-                EvmSketch::builder()
-                    .at_block(BlockNumberOrTag::Latest)
-                    .el_rpc_url(eth_rpc_url)
-                    .build()
-                    .await?
-            }
-            //SupportedChain::Arbitrum | SupportedChain::BnbChain | SupportedChain::Base | SupportedChain::Unichain | SupportedChain::Optimism => {
-            //    EvmSketch::builder()
-            //        .at_block(BlockNumberOrTag::Latest)
-            //        .with_genesis(chain.genesis()?)
-            //        .el_rpc_url(eth_rpc_url)
-            //        .build()
-            //        .await?
-            //}
-            //_ => unreachable!()
-            _ => {
+            SupportedChain::Ethereum | SupportedChain::Sepolia => {
                 EvmSketch::builder()
                     .at_block(BlockNumberOrTag::Latest)
                     .with_genesis(chain.genesis()?)
@@ -187,6 +171,15 @@ async fn main() -> eyre::Result<()> {
                     .build()
                     .await?
             }
+            SupportedChain::Arbitrum | SupportedChain::BnbChain => {
+                EvmSketch::builder()
+                    .at_block(BlockNumberOrTag::Latest)
+                    .with_genesis(chain.genesis()?)
+                    .el_rpc_url(eth_rpc_url)
+                    .build()
+                    .await?
+            }
+            _ => unreachable!()
         };
 
         println!("Checking call-wrapper contract deployment...");
@@ -212,7 +205,7 @@ async fn main() -> eyre::Result<()> {
         // Now that we've executed all of the calls, get the `EVMStateSketch` from the host executor.
         println!("Finalizing state sketch...");
         input = sketch.finalize().await?;
-    //}
+    }
 
     let input_bytes = bincode::serialize(&input)?;
     let mut stdin = SP1Stdin::new();

@@ -1,6 +1,19 @@
+//use std::fs;
+
+//use alloy_genesis::Genesis;
 use eyre::Result;
+//use reth_chainspec::ChainSpec;
 use sp1_cc_host_executor::Genesis;
+//use sp1_sdk::ChainSpec;
 use serde::{Deserialize, Serialize};
+
+pub const ETH_MAINNET_GENESIS_JSON: &str = include_str!("../genesis/1.json");
+pub const UNICHAIN_GENESIS_JSON: &str = include_str!("../genesis/130.json");
+pub const OPTIMISM_GENESIS_JSON: &str = include_str!("../genesis/10.json");
+pub const BASE_GENESIS_JSON: &str = include_str!("../genesis/8453.json");
+pub const ARBITRUM_GENESIS_JSON: &str = include_str!("../genesis/42161.json");
+pub const BSC_GENESIS_JSON: &str = include_str!("../genesis/56.json");
+pub const SEPOLIA_GENESIS_JSON: &str = include_str!("../genesis/11155111.json");
 
 /// Supported blockchain networks
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -17,6 +30,7 @@ pub enum SupportedChain {
     Arbitrum,
     /// Unichain (Chain ID: 130)
     Unichain,
+    Sepolia
 }
 
 impl SupportedChain {
@@ -29,6 +43,7 @@ impl SupportedChain {
             SupportedChain::Base => 8453,
             SupportedChain::Arbitrum => 42161,
             SupportedChain::Unichain => 130,
+            SupportedChain::Sepolia => 11155111,
         }
     }
 
@@ -41,35 +56,30 @@ impl SupportedChain {
             SupportedChain::Base => "base",
             SupportedChain::Arbitrum => "arbitrum",
             SupportedChain::Unichain => "unichain",
+            SupportedChain::Sepolia => "sepolia",
         }
     }
 
+
+    //let genesis_json = fs::read_to_string(genesis_path)
+    //    .map_err(|err| eyre::eyre!("Failed to read genesis file: {err}"))?;
+
     /// Get the genesis configuration for this chain
     pub fn genesis(&self) -> Result<Genesis> {
-        match self {
-            SupportedChain::Ethereum => Ok(Genesis::Mainnet),
-            //SupportedChain::Optimism => Ok(Genesis::OpMainnet),
-            SupportedChain::Optimism => {
-                let json = include_str!("../genesis/10.json");
-                Ok(Genesis::Custom(serde_json::from_str(json)?))
-            },
-            SupportedChain::BnbChain => {
-                let json = include_str!("../genesis/56.json");
-                Ok(Genesis::Custom(serde_json::from_str(json)?))
-            }
-            SupportedChain::Base => {
-                let json = include_str!("../genesis/8453.json");
-                Ok(Genesis::Custom(serde_json::from_str(json)?))
-            }
-            SupportedChain::Arbitrum => {
-                let json = include_str!("../genesis/42161.json");
-                Ok(Genesis::Custom(serde_json::from_str(json)?))
-            }
-            SupportedChain::Unichain => {
-                let json = include_str!("../genesis/130.json");
-                Ok(Genesis::Custom(serde_json::from_str(json)?))
-            }
-        }
+        let genesis_json = match self {
+            SupportedChain::Ethereum => ETH_MAINNET_GENESIS_JSON,
+            SupportedChain::Unichain => UNICHAIN_GENESIS_JSON,
+            SupportedChain::Optimism => OPTIMISM_GENESIS_JSON,
+            SupportedChain::BnbChain => BSC_GENESIS_JSON,
+            SupportedChain::Base => BASE_GENESIS_JSON,
+            SupportedChain::Arbitrum => ARBITRUM_GENESIS_JSON,
+            SupportedChain::Sepolia => SEPOLIA_GENESIS_JSON,
+            // add more as needed
+        };
+
+        let genesis = serde_json::from_str::<alloy_genesis::Genesis>(&genesis_json)?;
+
+        Ok(Genesis::Custom(genesis.config))
     }
 
     /// Check if this is an L2 or altchain (not Ethereum mainnet)
@@ -97,6 +107,7 @@ impl std::str::FromStr for SupportedChain {
             "base" => Ok(SupportedChain::Base),
             "arbitrum" | "arb" | "arbitrumone" => Ok(SupportedChain::Arbitrum),
             "unichain" | "uni" => Ok(SupportedChain::Unichain),
+            "sepolia" => Ok(SupportedChain::Sepolia),
             _ => Err(eyre::eyre!("Unsupported chain: {}", s)),
         }
     }
@@ -118,7 +129,8 @@ impl TryFrom<u64> for SupportedChain {
             56 => Ok(SupportedChain::BnbChain),
             8453 => Ok(SupportedChain::Base),
             42161 => Ok(SupportedChain::Arbitrum),
-            1301 => Ok(SupportedChain::Unichain),
+            130 => Ok(SupportedChain::Unichain),
+            11155111 => Ok(SupportedChain::Sepolia),
             _ => Err(eyre::eyre!("Unsupported chain ID: {}", chain_id)),
         }
     }
@@ -135,7 +147,8 @@ mod tests {
         assert_eq!(SupportedChain::BnbChain.chain_id(), 56);
         assert_eq!(SupportedChain::Base.chain_id(), 8453);
         assert_eq!(SupportedChain::Arbitrum.chain_id(), 42161);
-        assert_eq!(SupportedChain::Unichain.chain_id(), 1301);
+        assert_eq!(SupportedChain::Unichain.chain_id(), 130);
+        assert_eq!(SupportedChain::Sepolia.chain_id(), 11155111);
     }
 
     #[test]

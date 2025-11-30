@@ -2,8 +2,6 @@
   "config": {
     "chainId": 42161,
     "homesteadBlock": 0,
-    "daoForkBlock": 0,
-    "daoForkSupport": true,
     "eip150Block": 0,
     "eip155Block": 0,
     "eip158Block": 0,
@@ -17,8 +15,33 @@
     "arrowGlacierBlock": 0,
     "grayGlacierBlock": 0,
     "mergeNetsplitBlock": 0,
-    "terminalTotalDifficulty": "0",
+    "terminalTotalDifficulty": 0,
     "shanghaiTime": 1679079600,
-    "cancunTime": 1710424800
-  }
+    "cancunTime": 1715740800,
+    "arbitrum": {
+      "EnableArbOS": true,
+      "AllowDebugPrecompiles": false,
+      "DataAvailabilityCommittee": false,
+      "InitialArbOSVersion": 14,
+      "InitialChainOwner": "0xdeaddeaddEAddEAddeadDEaDDEAdDeaDDeAD0000",
+      "GenesisBlockNum": 0,
+      "TrustedUpdateDisabler": false,
+      "BatchPosterAddress": "0x0000000000000000000000000000000000000000",
+      "SequencerAddress": "0x0000000000000000000000000000000000000000"
+    }
+  },
+  "nonce": "0x0",
+  "timestamp": "0x617d18e0",
+  "extraData": "0x",
+  "gasLimit": "0x1c9c380",
+  "difficulty": "0x0",
+  "coinbase": "0x0000000000000000000000000000000000000000",
+  "alloc": {},
+  "number": "0x0",
+  "gasUsed": "0x0",
+  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "baseFeePerGas": "0x0",
+  "prevrandao": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "excessBlobGas": "0x0",
+  "blobGasUsed": "0x0"
 }

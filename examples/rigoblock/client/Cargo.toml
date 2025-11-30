@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 # workspace
-sp1-cc-client-executor = { path = "../../../crates/client-executor" }
+sp1-cc-client-executor = { path = "../../../crates/client-executor", features = ["optimism"] }
 
 # alloy
 alloy-primitives = { workspace = true, features = ["serde"] }
