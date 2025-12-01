@@ -245,6 +245,7 @@ impl<'a, P: Primitives> ClientExecutor<'a, P> {
 
             P::validate_header(ancestor, chain_spec.clone())
                 .unwrap_or_else(|_| panic!("the ancestor {} header in not valid", ancestor.number));
+
             assert_eq!(
                 previous_header.parent_hash, ancestor_hash,
                 "block {} is not the parent of {}",
