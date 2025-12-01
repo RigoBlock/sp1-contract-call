@@ -232,6 +232,9 @@ impl<'a, P: Primitives> ClientExecutor<'a, P> {
 
         let sealed_headers = sketch_input.sealed_headers().collect::<Vec<_>>();
 
+        P::validate_header(&sealed_headers[0], chain_spec.clone())
+            .expect("the header is not valid");
+
         // Verify the state root
         assert_eq!(header.state_root, sketch_input.state.state_root(), "State root mismatch");
 
@@ -239,6 +242,9 @@ impl<'a, P: Primitives> ClientExecutor<'a, P> {
         let mut previous_header = header;
         for ancestor in sealed_headers.iter().skip(1) {
             let ancestor_hash = ancestor.hash();
+
+            P::validate_header(ancestor, chain_spec.clone())
+                .unwrap_or_else(|_| panic!("the ancestor {} header in not valid", ancestor.number));
 
             assert_eq!(
                 previous_header.parent_hash, ancestor_hash,
